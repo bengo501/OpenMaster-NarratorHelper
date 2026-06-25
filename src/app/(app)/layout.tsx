@@ -1,13 +1,18 @@
+import Link from "next/link";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { getUser } from "@/lib/auth";
+import { signOut } from "@/lib/auth-actions";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
-export default function AppLayout({
+export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const configured = isSupabaseConfigured();
+  const user = configured ? await getUser() : null;
 
   return (
     <div className="flex min-h-screen">
@@ -20,7 +25,27 @@ export default function AppLayout({
             className="h-9 w-72 rounded-lg border border-border bg-transparent px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
             disabled
           />
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            {user ? (
+              <>
+                <span className="hidden text-sm text-muted-foreground sm:inline">
+                  {user.email}
+                </span>
+                <form action={signOut}>
+                  <Button variant="ghost" size="sm" type="submit">
+                    Sair
+                  </Button>
+                </form>
+              </>
+            ) : configured ? (
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  Entrar
+                </Button>
+              </Link>
+            ) : null}
+            <ThemeToggle />
+          </div>
         </header>
 
         {!configured && (

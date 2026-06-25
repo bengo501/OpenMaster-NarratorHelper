@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, ready: true },
-  { href: "/campaigns", label: "Campanhas", icon: BookOpen, ready: false },
+  { href: "/campaigns", label: "Campanhas", icon: BookOpen, ready: true },
   { href: "/actors", label: "Personagens & NPCs", icon: Users, ready: false },
   { href: "/locations", label: "Locais", icon: MapPin, ready: false },
   { href: "/sessions", label: "Sessões", icon: ScrollText, ready: false },
@@ -38,7 +38,8 @@ export function AppSidebar() {
       <nav className="flex flex-col gap-1 p-3">
         {nav.map((item) => {
           const Icon = item.icon;
-          const active = pathname === item.href;
+          const active =
+            pathname === item.href || pathname.startsWith(item.href + "/");
 
           if (!item.ready) {
             return (
@@ -72,7 +73,7 @@ export function AppSidebar() {
         })}
       </nav>
       <div className="mt-auto p-3 text-xs text-muted-foreground">
-        v0.1 · M0 scaffold
+        v0.1 · M1
       </div>
     </aside>
   );
