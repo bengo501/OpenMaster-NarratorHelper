@@ -5,28 +5,33 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getUser } from "@/lib/auth";
-import { deleteCampaign, getCampaign } from "@/lib/campaigns/actions";
+import { listActors } from "@/lib/actors/actions";
+import { deleteCampaign } from "@/lib/campaigns/actions";
 import { STATUS_LABELS } from "@/lib/campaigns/constants";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { loadCampaign } from "@/lib/campaigns/context";
+import { listLocations } from "@/lib/locations/actions";
 
 export default async function CampaignPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  if (!isSupabaseConfigured()) return <DemoNotice />;
-  const user = await getUser();
-  if (!user) return <LoginNotice />;
-
   const { id } = await params;
-  const campaign = await getCampaign(id);
-  if (!campaign) notFound();
+  const ctx = await loadCampaign(id);
+  if (ctx.status === "demo") return <DemoNotice />;
+  if (ctx.status === "login") return <LoginNotice />;
+  if (ctx.status === "notfound") notFound();
 
+  const campaign = ctx.campaign;
   const tpl = campaign.systemSnapshot;
+  const [actors, locations] = await Promise.all([
+    listActors(id),
+    listLocations(id),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -69,47 +74,45 @@ export default async function CampaignPage({
         </Card>
       )}
 
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Link href={`/campaigns/${id}/actors`}>
+          <Card className="h-full transition-colors hover:border-primary/50">
+            <CardHeader>
+              <CardTitle>Personagens & NPCs</CardTitle>
+              <CardDescription>{actors.length} cadastrado(s)</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link href={`/campaigns/${id}/locations`}>
+          <Card className="h-full transition-colors hover:border-primary/50">
+            <CardHeader>
+              <CardTitle>Locais</CardTitle>
+              <CardDescription>{locations.length} cadastrado(s)</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Sistema: {tpl.name}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <div>
-            <div className="mb-1 font-medium">Atributos</div>
-            <div className="flex flex-wrap gap-2">
-              {tpl.attributes.map((a) => (
-                <span
-                  key={a.key}
-                  className="rounded bg-muted px-2 py-0.5 text-xs"
-                >
-                  {a.label}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="mb-1 font-medium">Recursos</div>
-            <div className="flex flex-wrap gap-2">
-              {tpl.resources.map((r) => (
-                <span
-                  key={r.key}
-                  className="rounded bg-muted px-2 py-0.5 text-xs"
-                >
-                  {r.label}
-                </span>
-              ))}
-            </div>
+          <div className="flex flex-wrap gap-2">
+            {tpl.attributes.map((a) => (
+              <span
+                key={a.key}
+                className="rounded bg-muted px-2 py-0.5 text-xs"
+              >
+                {a.label}
+              </span>
+            ))}
           </div>
           <p className="text-muted-foreground">
             Rolagem base: <code>{tpl.rolls.default.formula}</code> ({tpl.kind})
           </p>
         </CardContent>
       </Card>
-
-      <p className="text-sm text-muted-foreground">
-        Personagens, NPCs, locais e sessões desta campanha chegam nos próximos
-        marcos (M2–M3).
-      </p>
     </div>
   );
 }

@@ -33,3 +33,47 @@ drop policy if exists "campaign_delete_own" on campaign;
 create policy "campaign_delete_own" on campaign
   for delete to authenticated
   using (auth.uid() = owner_id);
+
+-- ---------------------------------------------------------------------------
+-- actor (M2)
+-- ---------------------------------------------------------------------------
+alter table actor enable row level security;
+
+drop policy if exists "actor_select_own" on actor;
+create policy "actor_select_own" on actor
+  for select to authenticated using (auth.uid() = owner_id);
+
+drop policy if exists "actor_insert_own" on actor;
+create policy "actor_insert_own" on actor
+  for insert to authenticated with check (auth.uid() = owner_id);
+
+drop policy if exists "actor_update_own" on actor;
+create policy "actor_update_own" on actor
+  for update to authenticated
+  using (auth.uid() = owner_id) with check (auth.uid() = owner_id);
+
+drop policy if exists "actor_delete_own" on actor;
+create policy "actor_delete_own" on actor
+  for delete to authenticated using (auth.uid() = owner_id);
+
+-- ---------------------------------------------------------------------------
+-- location (M2)
+-- ---------------------------------------------------------------------------
+alter table location enable row level security;
+
+drop policy if exists "location_select_own" on location;
+create policy "location_select_own" on location
+  for select to authenticated using (auth.uid() = owner_id);
+
+drop policy if exists "location_insert_own" on location;
+create policy "location_insert_own" on location
+  for insert to authenticated with check (auth.uid() = owner_id);
+
+drop policy if exists "location_update_own" on location;
+create policy "location_update_own" on location
+  for update to authenticated
+  using (auth.uid() = owner_id) with check (auth.uid() = owner_id);
+
+drop policy if exists "location_delete_own" on location;
+create policy "location_delete_own" on location
+  for delete to authenticated using (auth.uid() = owner_id);
