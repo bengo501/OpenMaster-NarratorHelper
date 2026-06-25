@@ -14,6 +14,8 @@ import { deleteCampaign } from "@/lib/campaigns/actions";
 import { STATUS_LABELS } from "@/lib/campaigns/constants";
 import { loadCampaign } from "@/lib/campaigns/context";
 import { listLocations } from "@/lib/locations/actions";
+import { listNotes } from "@/lib/notes/actions";
+import { listSessions } from "@/lib/sessions/actions";
 
 export default async function CampaignPage({
   params,
@@ -28,9 +30,11 @@ export default async function CampaignPage({
 
   const campaign = ctx.campaign;
   const tpl = campaign.systemSnapshot;
-  const [actors, locations] = await Promise.all([
+  const [actors, locations, gameSessions, campaignNotes] = await Promise.all([
     listActors(id),
     listLocations(id),
+    listSessions(id),
+    listNotes(id),
   ]);
 
   return (
@@ -88,6 +92,24 @@ export default async function CampaignPage({
             <CardHeader>
               <CardTitle>Locais</CardTitle>
               <CardDescription>{locations.length} cadastrado(s)</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link href={`/campaigns/${id}/sessions`}>
+          <Card className="h-full transition-colors hover:border-primary/50">
+            <CardHeader>
+              <CardTitle>Sessões</CardTitle>
+              <CardDescription>
+                {gameSessions.length} registrada(s)
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link href={`/campaigns/${id}/notes`}>
+          <Card className="h-full transition-colors hover:border-primary/50">
+            <CardHeader>
+              <CardTitle>Notas</CardTitle>
+              <CardDescription>{campaignNotes.length} nota(s)</CardDescription>
             </CardHeader>
           </Card>
         </Link>

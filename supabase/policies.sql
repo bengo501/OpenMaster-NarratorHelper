@@ -77,3 +77,54 @@ create policy "location_update_own" on location
 drop policy if exists "location_delete_own" on location;
 create policy "location_delete_own" on location
   for delete to authenticated using (auth.uid() = owner_id);
+
+-- ---------------------------------------------------------------------------
+-- session, scene, note (M3)
+-- ---------------------------------------------------------------------------
+alter table session enable row level security;
+
+drop policy if exists "session_select_own" on session;
+create policy "session_select_own" on session
+  for select to authenticated using (auth.uid() = owner_id);
+drop policy if exists "session_insert_own" on session;
+create policy "session_insert_own" on session
+  for insert to authenticated with check (auth.uid() = owner_id);
+drop policy if exists "session_update_own" on session;
+create policy "session_update_own" on session
+  for update to authenticated
+  using (auth.uid() = owner_id) with check (auth.uid() = owner_id);
+drop policy if exists "session_delete_own" on session;
+create policy "session_delete_own" on session
+  for delete to authenticated using (auth.uid() = owner_id);
+
+alter table scene enable row level security;
+
+drop policy if exists "scene_select_own" on scene;
+create policy "scene_select_own" on scene
+  for select to authenticated using (auth.uid() = owner_id);
+drop policy if exists "scene_insert_own" on scene;
+create policy "scene_insert_own" on scene
+  for insert to authenticated with check (auth.uid() = owner_id);
+drop policy if exists "scene_update_own" on scene;
+create policy "scene_update_own" on scene
+  for update to authenticated
+  using (auth.uid() = owner_id) with check (auth.uid() = owner_id);
+drop policy if exists "scene_delete_own" on scene;
+create policy "scene_delete_own" on scene
+  for delete to authenticated using (auth.uid() = owner_id);
+
+alter table note enable row level security;
+
+drop policy if exists "note_select_own" on note;
+create policy "note_select_own" on note
+  for select to authenticated using (auth.uid() = owner_id);
+drop policy if exists "note_insert_own" on note;
+create policy "note_insert_own" on note
+  for insert to authenticated with check (auth.uid() = owner_id);
+drop policy if exists "note_update_own" on note;
+create policy "note_update_own" on note
+  for update to authenticated
+  using (auth.uid() = owner_id) with check (auth.uid() = owner_id);
+drop policy if exists "note_delete_own" on note;
+create policy "note_delete_own" on note
+  for delete to authenticated using (auth.uid() = owner_id);

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppSidebar } from "@/components/app-sidebar";
+import { GlobalSearch } from "@/components/global-search";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/auth";
@@ -19,12 +20,7 @@ export default async function AppLayout({
       <AppSidebar />
       <div className="flex flex-1 flex-col">
         <header className="flex h-14 items-center justify-between border-b border-border px-6">
-          <input
-            type="search"
-            placeholder="Busca global…  (em breve)"
-            className="h-9 w-72 rounded-lg border border-border bg-transparent px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            disabled
-          />
+          <GlobalSearch />
           <div className="flex items-center gap-3">
             {user ? (
               <>

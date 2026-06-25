@@ -17,6 +17,8 @@ export function CampaignTabs({
     { href: base, label: "Visão geral", exact: true },
     { href: `${base}/actors`, label: "Personagens & NPCs" },
     { href: `${base}/locations`, label: "Locais" },
+    { href: `${base}/sessions`, label: "Sessões" },
+    { href: `${base}/notes`, label: "Notas" },
   ];
 
   return (
@@ -28,7 +30,7 @@ export function CampaignTabs({
         <span>/</span>
         <span className="font-medium text-foreground">{campaignName}</span>
       </div>
-      <nav className="flex gap-1 border-b border-border">
+      <nav className="flex flex-wrap gap-1 border-b border-border">
         {tabs.map((t) => {
           const active = t.exact
             ? pathname === t.href

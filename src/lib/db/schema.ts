@@ -1,7 +1,10 @@
 import { sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
+  boolean,
+  date,
   index,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -151,3 +154,127 @@ export const locations = pgTable(
 
 export type Location = typeof locations.$inferSelect;
 export type NewLocation = typeof locations.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Sessões e Cenas — M3
+// ---------------------------------------------------------------------------
+
+export const sessionStatus = pgEnum("session_status", [
+  "planned",
+  "running",
+  "done",
+  "canceled",
+]);
+
+export const sessions = pgTable(
+  "session",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    campaignId: uuid("campaign_id")
+      .notNull()
+      .references(() => campaigns.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id").notNull(),
+    title: text("title").notNull(),
+    sessionDate: date("session_date"),
+    status: sessionStatus("status").notNull().default("planned"),
+    /** O que o mestre planejou. */
+    plannedSummary: text("planned_summary"),
+    /** O que de fato aconteceu. */
+    actualSummary: text("actual_summary"),
+    /** Notas privadas do mestre. */
+    gmNotes: text("gm_notes"),
+    data: jsonb("data")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("session_campaign_idx").on(table.campaignId),
+    index("session_owner_idx").on(table.ownerId),
+  ],
+);
+
+export type GameSession = typeof sessions.$inferSelect;
+export type NewGameSession = typeof sessions.$inferInsert;
+
+export const sceneStatus = pgEnum("scene_status", [
+  "planned",
+  "done",
+  "skipped",
+]);
+
+export const scenes = pgTable(
+  "scene",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    campaignId: uuid("campaign_id")
+      .notNull()
+      .references(() => campaigns.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary"),
+    status: sceneStatus("status").notNull().default("planned"),
+    order: integer("order").notNull().default(0),
+    data: jsonb("data")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("scene_session_idx").on(table.sessionId),
+    index("scene_owner_idx").on(table.ownerId),
+  ],
+);
+
+export type Scene = typeof scenes.$inferSelect;
+export type NewScene = typeof scenes.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Notas — M3
+// ---------------------------------------------------------------------------
+
+export const notes = pgTable(
+  "note",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    campaignId: uuid("campaign_id")
+      .notNull()
+      .references(() => campaigns.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id").notNull(),
+    title: text("title"),
+    body: text("body").notNull().default(""),
+    pinned: boolean("pinned").notNull().default(false),
+    data: jsonb("data")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("note_campaign_idx").on(table.campaignId),
+    index("note_owner_idx").on(table.ownerId),
+  ],
+);
+
+export type Note = typeof notes.$inferSelect;
+export type NewNote = typeof notes.$inferInsert;
