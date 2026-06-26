@@ -27,9 +27,14 @@ export default async function CampaignsPage() {
           <h1 className="text-2xl font-bold tracking-tight">Campanhas</h1>
           <p className="text-muted-foreground">Suas mesas e mundos.</p>
         </div>
-        <Link href="/campaigns/new">
-          <Button>Nova campanha</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/campaigns/import">
+            <Button variant="outline">Importar</Button>
+          </Link>
+          <Link href="/campaigns/new">
+            <Button>Nova campanha</Button>
+          </Link>
+        </div>
       </div>
 
       {rows.length === 0 ? (

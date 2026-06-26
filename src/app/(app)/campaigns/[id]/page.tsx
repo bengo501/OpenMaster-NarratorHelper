@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DemoNotice, LoginNotice } from "@/components/access-notices";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -59,6 +59,12 @@ export default async function CampaignPage({
           </p>
         </div>
         <div className="flex gap-2">
+          <a
+            href={`/campaigns/${campaign.id}/export`}
+            className={buttonVariants({ variant: "outline" })}
+          >
+            Exportar
+          </a>
           <Link href={`/campaigns/${campaign.id}/edit`}>
             <Button variant="outline">Editar</Button>
           </Link>
